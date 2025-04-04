@@ -1,20 +1,27 @@
-version: "3.8"
-
 services:
   docker1:
     build: ./docker1
     ports:
-      - "5000:5000"
+      - "5002:5000"
     depends_on:
       - docker2
+    networks:
+      - backend
   
   docker2:
     build:
       ./docker2
     depends_on:
       - docker3
+    networks:
+      - backend
 
   docker3:
     build: ./docker3
     ports:
       - "5001:5000"
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge

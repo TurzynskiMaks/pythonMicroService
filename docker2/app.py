@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
 import requests
 
-app = flask(__name__)
+app = Flask(__name__)
 
 def fibonacci(n):
-    sequence = [0,1]
+    sequence = [1,1]
     while len(sequence) < n:
         sequence.append(sequence[-1] + sequence[-2])
     return sequence[:n]
