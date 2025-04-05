@@ -1,13 +1,15 @@
 from flask import Flask, request, render_template_string, Response
+import redis
 import threading
 
 app = Flask(__name__)
 
-calculated = "Brak (jeszcze)"
+redisClient = redis.Redis(host='redis', port=6379, decode_responses=True)
 event = threading.Event()
 
 @app.route('/')
 def showCalculated():
+    calculated = redisClient.get('fibonacciSum') or "Brak wyniku (jeszcze)"
     return render_template_string("""
         <html>
             <head>
@@ -25,14 +27,10 @@ def showCalculated():
         </html>
     """, result=calculated)
 
-
-@app.route('/result', methods=['POST'])
-def update_result():
-    global calculated
-    data = request.json
-    calculated = data.get('sum')
+@app.route('/trigger-refresh', methods=['POST'])
+def triggerRefresh():
     event.set()
-    return {"status": "Saved"}
+    return {"status": "Frontend refresh triggered"}
 
 @app.route('/stream')
 def stream():

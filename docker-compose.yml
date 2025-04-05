@@ -38,6 +38,8 @@ services:
       - backend
     volumes:
       - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
   flower:
     image: mher/flower
