@@ -1,24 +1,26 @@
 from flask import Flask, request, jsonify
+from celery import Celery
 import requests
 
 app = Flask(__name__)
 
-def fibonacci(n):
-    sequence = [1,1]
-    while len(sequence) < n:
-        sequence.append(sequence[-1] + sequence[-2])
-    return sequence[:n]
 
-@app.route('/fib', methods=['POST'])
+celeryApp = Celery('tasks', broker='redis://redis:6379/0')
 
-def calculateFib():
+
+@app.route('/submit-task', methods=['POST'])
+def submitTask():
     data = request.json
     integer = int(data.get('integer'))
-    fib = fibonacci(integer)
-    sumFib = sum(fib)
     
-    requests.post('http://docker3:5000/result', json={'sum': sumFib})
+    celeryApp.send_task('worker.calculateFib', args=[integer])
     
-    return jsonify({"fib": fib, "sum": sumFib})
+    try:
+        response = requests.post('http://docker3:5000/trigger-refresh')
+        print(f"Triggered frontend refresh: {response.status_code}")
+    except Exception as e:
+        print(f"Error triggering frontend: {e}")
+    
+    return jsonify({"status": "Task submitted to Celery!"})
 
 app.run(host='0.0.0.0', port=5000)
