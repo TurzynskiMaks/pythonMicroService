@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install flask requests
+RUN pip install flask requests celery redis
 
 CMD ["python", "app.py"]

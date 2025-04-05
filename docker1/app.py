@@ -12,7 +12,7 @@ def input_data():
         return jsonify({"error": "Did not get an integer"}), 400
     print(f"Integer = {integer}")
     
-    response = requests.post('http://docker2:5000/fib', json={"integer": integer})
-    return jsonify({"status": "Send to Docker 2", "Docker2Response": response.json()})
+    response = requests.post('http://docker2:5000/submit-task', json={"integer": integer})
+    return jsonify({"status": "Sent to Docker 2", "Docker2Response": response.json()})
 
 app.run(host='0.0.0.0', port=5000)
